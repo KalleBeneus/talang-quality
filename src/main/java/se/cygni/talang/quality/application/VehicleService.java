@@ -20,8 +20,8 @@ public class VehicleService {
         this.repo = repo;
     }
 
-    public void assignOwner(String ownerOrgNumber, String registration) {
-        Vehicle vehicle = getVehicleIfExists(registration);
+    public void assignOwner(String ownerOrgNumber, String vehicleRegistration) {
+        Vehicle vehicle = getVehicleIfExists(vehicleRegistration);
         if (Objects.equals(vehicle.getOwner(), ownerOrgNumber)) {
             return;
         }
@@ -33,7 +33,6 @@ public class VehicleService {
         if (!approvedBrands.contains(vehicle.getBrand())) {
             throw new NotAllowedException("The brand " + vehicle.getBrand() + " is not applicable for dealer " + ownerOrgNumber);
         }
-
 
         Dealer newOwner = getDealerIfExists(ownerOrgNumber);
         vehicle.setOwner(ownerOrgNumber);
