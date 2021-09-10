@@ -1,8 +1,8 @@
 package se.cygni.talang.quality.repo;
 
-import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
-import se.cygni.talang.quality.model.Vehicle;
+import se.cygni.talang.quality.domain.Brand;
+import se.cygni.talang.quality.domain.Dealer;
+import se.cygni.talang.quality.domain.Vehicle;
 
 import java.util.List;
 

@@ -3,9 +3,9 @@ package se.cygni.talang.quality.application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.cygni.talang.quality.exceptions.NotAllowedException;
-import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
-import se.cygni.talang.quality.model.Vehicle;
+import se.cygni.talang.quality.domain.Brand;
+import se.cygni.talang.quality.domain.Dealer;
+import se.cygni.talang.quality.domain.Vehicle;
 import se.cygni.talang.quality.repo.Repository;
 
 import java.util.HashMap;

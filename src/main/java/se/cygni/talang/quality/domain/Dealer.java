@@ -1,4 +1,4 @@
-package se.cygni.talang.quality.model;
+package se.cygni.talang.quality.domain;
 
 import java.util.Objects;
 

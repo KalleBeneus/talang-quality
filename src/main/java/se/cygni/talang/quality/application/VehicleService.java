@@ -1,15 +1,13 @@
 package se.cygni.talang.quality.application;
 
 import org.springframework.stereotype.Component;
-import se.cygni.talang.quality.exceptions.NotAllowedException;
 import se.cygni.talang.quality.exceptions.NotFoundException;
-import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
-import se.cygni.talang.quality.model.Vehicle;
+import se.cygni.talang.quality.domain.Brand;
+import se.cygni.talang.quality.domain.Dealer;
+import se.cygni.talang.quality.domain.Vehicle;
 import se.cygni.talang.quality.repo.Repository;
 
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class VehicleService {
@@ -22,33 +20,18 @@ public class VehicleService {
 
     public void assignOwner(String ownerOrgNumber, String registration) {
         Vehicle vehicle = getVehicleIfExists(registration);
-        if (Objects.equals(vehicle.getOwner(), ownerOrgNumber)) {
-            return;
-        }
-        if (vehicle.getOwner() != null) {
-            throw new NotAllowedException("Only vehicles without current assignment can be updated");
-        }
-
-        List<Brand> approvedBrands = repo.getApprovedBrands(ownerOrgNumber);
-        if (!approvedBrands.contains(vehicle.getBrand())) {
-            throw new NotAllowedException("The brand " + vehicle.getBrand() + " is not applicable for dealer " + ownerOrgNumber);
-        }
-
-
         Dealer newOwner = getDealerIfExists(ownerOrgNumber);
-        vehicle.setOwner(ownerOrgNumber);
-        if (vehicle.getBrand() == Brand.LAMBORGHINI) {
-            newOwner.setPremiumCustomer(true);
-            repo.saveDealer(newOwner);
-        }
+        List<Brand> approvedBrands = repo.getApprovedBrands(ownerOrgNumber);
 
+        vehicle.assignOwner(newOwner, approvedBrands);
+
+        repo.saveDealer(newOwner);
         repo.saveVehicle(vehicle);
-
     }
 
     private Dealer getDealerIfExists(String orgNumber) {
         Dealer dealer = repo.getDealerByOrgNumber(orgNumber);
-        if(dealer == null) {
+        if (dealer == null) {
             throw new NotFoundException("No dealer found for org number " + orgNumber);
         }
         return dealer;
