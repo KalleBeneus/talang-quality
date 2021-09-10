@@ -29,14 +29,11 @@ public class VehicleService {
             throw new NotAllowedException("Only vehicles without current assignment can be updated");
         }
 
-        List<Brand> approvedBrands = repo.getApprovedBrands(ownerOrgNumber);
-        if (!approvedBrands.contains(vehicle.getBrand())) {
-            throw new NotAllowedException("The brand " + vehicle.getBrand() + " is not applicable for dealer " + ownerOrgNumber);
-        }
+        List<Brand> premiumBrands = repo.getPremiumBrands();
 
-        Dealer newOwner = getDealerIfExists(ownerOrgNumber);
         vehicle.setOwner(ownerOrgNumber);
-        if (vehicle.getBrand() == Brand.LAMBORGHINI) {
+        if (premiumBrands.contains(vehicle.getBrand())) {
+            Dealer newOwner = getDealerIfExists(ownerOrgNumber);
             newOwner.setPremiumCustomer(true);
             repo.saveDealer(newOwner);
         }
@@ -47,7 +44,7 @@ public class VehicleService {
 
     private Dealer getDealerIfExists(String orgNumber) {
         Dealer dealer = repo.getDealerByOrgNumber(orgNumber);
-        if(dealer == null) {
+        if (dealer == null) {
             throw new NotFoundException("No dealer found for org number " + orgNumber);
         }
         return dealer;

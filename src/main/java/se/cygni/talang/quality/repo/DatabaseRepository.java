@@ -20,7 +20,7 @@ public class DatabaseRepository implements Repository {
     }
 
     @Override
-    public List<Brand> getApprovedBrands(String ownerOrgNumber) {
+    public List<Brand> getPremiumBrands() {
         return null;
     }
 

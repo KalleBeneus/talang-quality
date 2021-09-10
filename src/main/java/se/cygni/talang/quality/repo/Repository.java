@@ -12,7 +12,7 @@ public interface Repository {
 
     Dealer getDealerByOrgNumber(String orgNumber);
 
-    List<Brand> getApprovedBrands(String ownerOrgNumber);
+    List<Brand> getPremiumBrands();
 
     void saveVehicle(Vehicle vehicle);
 

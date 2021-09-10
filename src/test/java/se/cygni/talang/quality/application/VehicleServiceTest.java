@@ -52,29 +52,14 @@ class VehicleServiceTest {
     }
 
     @Test
-    void assignOwner_vehicleBrandIsNotApproved_notAllowed() {
-        // Arrange
-        Vehicle expectedVehicle = new Vehicle("ABC123");
-        expectedVehicle.setBrand(Brand.VOLVO);
-        List<Brand> allowedBrands = List.of(Brand.TOYOTA);
-        Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
-        Mockito.when(repositoryMock.getApprovedBrands("123-456789")).thenReturn(allowedBrands);
-        // Act & Assert
-        Assertions.assertThrows(NotAllowedException.class, () ->
-                sut.assignOwner("123-456789", "ABC123"));
-    }
-
-    @Test
     void assignOwner_normalVehicleAssignedToNonPremiumDealer_onlyVehicleIsUpdated() {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.VOLVO);
-        List<Brand> allowedBrands = List.of(Brand.VOLVO);
-        Dealer expectedDealer = new Dealer("123-456789");
+        List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
-        Mockito.when(repositoryMock.getApprovedBrands("123-456789")).thenReturn(allowedBrands);
-        Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
+        Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -90,12 +75,12 @@ class VehicleServiceTest {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.LAMBORGHINI);
-        List<Brand> allowedBrands = List.of(Brand.LAMBORGHINI);
+        List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
         Dealer expectedDealer = new Dealer("123-456789");
         expectedDealer.setPremiumCustomer(false);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
-        Mockito.when(repositoryMock.getApprovedBrands("123-456789")).thenReturn(allowedBrands);
+        Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
         Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
 
         // Act
@@ -113,13 +98,10 @@ class VehicleServiceTest {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.VOLVO);
-        List<Brand> allowedBrands = List.of(Brand.VOLVO);
-        Dealer expectedDealer = new Dealer("123-456789");
-        expectedDealer.setPremiumCustomer(true);
+        List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
-        Mockito.when(repositoryMock.getApprovedBrands("123-456789")).thenReturn(allowedBrands);
-        Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
+        Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -135,12 +117,12 @@ class VehicleServiceTest {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.LAMBORGHINI);
-        List<Brand> allowedBrands = List.of(Brand.LAMBORGHINI);
+        List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
         Dealer expectedDealer = new Dealer("123-456789");
         expectedDealer.setPremiumCustomer(true);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
-        Mockito.when(repositoryMock.getApprovedBrands("123-456789")).thenReturn(allowedBrands);
+        Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
         Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
 
         // Act
