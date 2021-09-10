@@ -28,10 +28,9 @@ public class VehicleService {
         if (vehicle.getOwner() != null) {
             throw new NotAllowedException("Only vehicles without current assignment can be updated");
         }
+        vehicle.setOwner(ownerOrgNumber);
 
         List<Brand> premiumBrands = repo.getPremiumBrands();
-
-        vehicle.setOwner(ownerOrgNumber);
         if (premiumBrands.contains(vehicle.getBrand())) {
             Dealer newOwner = getDealerIfExists(ownerOrgNumber);
             newOwner.setPremiumCustomer(true);
