@@ -46,4 +46,13 @@ public class Vehicle {
     public int hashCode() {
         return Objects.hash(registrationNumber, owner, brand);
     }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "registrationNumber='" + registrationNumber + '\'' +
+                ", owner='" + owner + '\'' +
+                ", brand=" + brand +
+                '}';
+    }
 }

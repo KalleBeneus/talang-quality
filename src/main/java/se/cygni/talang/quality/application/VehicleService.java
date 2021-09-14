@@ -1,5 +1,7 @@
 package se.cygni.talang.quality.application;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import se.cygni.talang.quality.exceptions.NotAllowedException;
 import se.cygni.talang.quality.exceptions.NotFoundException;
@@ -13,6 +15,7 @@ import java.util.Objects;
 
 @Component
 public class VehicleService {
+    Logger log = LoggerFactory.getLogger(VehicleService.class);
 
     Repository repo;
 
@@ -23,6 +26,7 @@ public class VehicleService {
     public void assignOwner(String ownerOrgNumber, String vehicleRegistration) {
         Vehicle vehicle = getVehicleIfExists(vehicleRegistration);
         if (Objects.equals(vehicle.getOwner(), ownerOrgNumber)) {
+            log.info("No update needed");
             return;
         }
         if (vehicle.getOwner() != null) {
@@ -38,7 +42,7 @@ public class VehicleService {
         }
 
         repo.saveVehicle(vehicle);
-
+        log.info("Vehicle updated successfully");
     }
 
     private Dealer getDealerIfExists(String orgNumber) {
