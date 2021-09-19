@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 public class Endpoints {
 
-    private VehicleService vehicleService;
+    private final VehicleService vehicleService;
 
     public Endpoints(VehicleService vehicleService) {
         this.vehicleService = vehicleService;

@@ -8,8 +8,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.cygni.talang.quality.exceptions.NotAllowedException;
+import se.cygni.talang.quality.exceptions.NotFoundException;
 import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
+import se.cygni.talang.quality.model.Customer;
 import se.cygni.talang.quality.model.Vehicle;
 import se.cygni.talang.quality.repo.DatabaseRepository;
 
@@ -52,14 +53,34 @@ class VehicleServiceTest {
     }
 
     @Test
-    void assignOwner_normalVehicleAssignedToNonPremiumDealer_onlyVehicleIsUpdated() {
+    void assignOwner_vehicleNotFound_throwError() {
+        // Act & Assert
+        Assertions.assertThrows(NotFoundException.class, () ->
+                sut.assignOwner("123-456789", "ABC123"));
+    }
+
+    @Test
+    void assignOwner_customerNotFound_throwError() {
+        // Arrange
+        Vehicle expectedVehicle = new Vehicle("ABC123");
+        Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
+        // Act & Assert
+        Assertions.assertThrows(NotFoundException.class, () ->
+                sut.assignOwner("123-456789", "ABC123"));
+    }
+
+    @Test
+    void assignOwner_normalVehicleAssignedToNonPremiumCustomer_onlyVehicleIsUpdated() {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.VOLVO);
         List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
+        Customer expectedCustomer = new Customer("123-456789");
+        expectedCustomer.setPremiumCustomer(false);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
         Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
+        Mockito.when(repositoryMock.getCustomerByOrgNumber("123-456789")).thenReturn(expectedCustomer);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -67,21 +88,21 @@ class VehicleServiceTest {
         // Assert
         expectedVehicle.setOwner("123-456789");
         Mockito.verify(repositoryMock).saveVehicle(expectedVehicle);
-        Mockito.verify(repositoryMock, Mockito.never()).saveDealer(Mockito.any());
+        Mockito.verify(repositoryMock, Mockito.never()).saveCustomer(Mockito.any());
     }
 
     @Test
-    void assignOwner_premiumVehicleAssignedToNonPremiumDealer_vehicleAndDealerIsUpdated() {
+    void assignOwner_premiumVehicleAssignedToNonPremiumCustomer_vehicleAndCustomerIsUpdated() {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.LAMBORGHINI);
         List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
-        Dealer expectedDealer = new Dealer("123-456789");
-        expectedDealer.setPremiumCustomer(false);
+        Customer expectedCustomer = new Customer("123-456789");
+        expectedCustomer.setPremiumCustomer(false);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
         Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
-        Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
+        Mockito.when(repositoryMock.getCustomerByOrgNumber("123-456789")).thenReturn(expectedCustomer);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -89,19 +110,22 @@ class VehicleServiceTest {
         // Assert
         expectedVehicle.setOwner("123-456789");
         Mockito.verify(repositoryMock).saveVehicle(expectedVehicle);
-        expectedDealer.setPremiumCustomer(true);
-        Mockito.verify(repositoryMock).saveDealer(expectedDealer);
+        expectedCustomer.setPremiumCustomer(true);
+        Mockito.verify(repositoryMock).saveCustomer(expectedCustomer);
     }
 
     @Test
-    void assignOwner_normalVehicleAssignedToPremiumDealer_onlyVehicleIsUpdated() {
+    void assignOwner_normalVehicleAssignedToPremiumCustomer_onlyVehicleIsUpdated() {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.VOLVO);
         List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
+        Customer expectedCustomer = new Customer("123-456789");
+        expectedCustomer.setPremiumCustomer(true);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
         Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
+        Mockito.when(repositoryMock.getCustomerByOrgNumber("123-456789")).thenReturn(expectedCustomer);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -109,21 +133,21 @@ class VehicleServiceTest {
         // Assert
         expectedVehicle.setOwner("123-456789");
         Mockito.verify(repositoryMock).saveVehicle(expectedVehicle);
-        Mockito.verify(repositoryMock, Mockito.never()).saveDealer(Mockito.any());
+        Mockito.verify(repositoryMock, Mockito.never()).saveCustomer(Mockito.any());
     }
 
     @Test
-    void assignOwner_premiumVehicleAssignedToPremiumDealer_onlyVehicleIsUpdated() {
+    void assignOwner_premiumVehicleAssignedToPremiumCustomer_onlyVehicleIsUpdated() {
         // Arrange
         Vehicle expectedVehicle = new Vehicle("ABC123");
         expectedVehicle.setBrand(Brand.LAMBORGHINI);
         List<Brand> premiumBrands = List.of(Brand.LAMBORGHINI);
-        Dealer expectedDealer = new Dealer("123-456789");
-        expectedDealer.setPremiumCustomer(true);
+        Customer expectedCustomer = new Customer("123-456789");
+        expectedCustomer.setPremiumCustomer(true);
 
         Mockito.when(repositoryMock.getVehicleByRegistration("ABC123")).thenReturn(expectedVehicle);
         Mockito.when(repositoryMock.getPremiumBrands()).thenReturn(premiumBrands);
-        Mockito.when(repositoryMock.getDealerByOrgNumber("123-456789")).thenReturn(expectedDealer);
+        Mockito.when(repositoryMock.getCustomerByOrgNumber("123-456789")).thenReturn(expectedCustomer);
 
         // Act
         sut.assignOwner("123-456789", "ABC123");
@@ -131,6 +155,6 @@ class VehicleServiceTest {
         // Assert
         expectedVehicle.setOwner("123-456789");
         Mockito.verify(repositoryMock).saveVehicle(expectedVehicle);
-        Mockito.verify(repositoryMock).saveDealer(expectedDealer);
+        Mockito.verify(repositoryMock).saveCustomer(expectedCustomer);
     }
 }

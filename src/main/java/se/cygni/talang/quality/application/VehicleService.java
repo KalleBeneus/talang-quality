@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import se.cygni.talang.quality.exceptions.NotAllowedException;
 import se.cygni.talang.quality.exceptions.NotFoundException;
 import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
+import se.cygni.talang.quality.model.Customer;
 import se.cygni.talang.quality.model.Vehicle;
 import se.cygni.talang.quality.repo.Repository;
 
@@ -32,25 +32,18 @@ public class VehicleService {
         if (vehicle.getOwner() != null) {
             throw new NotAllowedException("Only vehicles without current assignment can be updated");
         }
-        vehicle.setOwner(ownerOrgNumber);
+
+        Customer newOwner = getCustomerIfExists(ownerOrgNumber);
+        vehicle.setOwner(newOwner.getOrganisationNumber());
 
         List<Brand> premiumBrands = repo.getPremiumBrands();
         if (premiumBrands.contains(vehicle.getBrand())) {
-            Dealer newOwner = getDealerIfExists(ownerOrgNumber);
             newOwner.setPremiumCustomer(true);
-            repo.saveDealer(newOwner);
+            repo.saveCustomer(newOwner);
         }
 
         repo.saveVehicle(vehicle);
         log.info("Vehicle updated successfully");
-    }
-
-    private Dealer getDealerIfExists(String orgNumber) {
-        Dealer dealer = repo.getDealerByOrgNumber(orgNumber);
-        if (dealer == null) {
-            throw new NotFoundException("No dealer found for org number " + orgNumber);
-        }
-        return dealer;
     }
 
     private Vehicle getVehicleIfExists(String registration) {
@@ -59,5 +52,13 @@ public class VehicleService {
             throw new NotFoundException("No vehicle found for registration " + registration);
         }
         return vehicle;
+    }
+
+    private Customer getCustomerIfExists(String orgNumber) {
+        Customer customer = repo.getCustomerByOrgNumber(orgNumber);
+        if (customer == null) {
+            throw new NotFoundException("No customer found for org number " + orgNumber);
+        }
+        return customer;
     }
 }

@@ -3,7 +3,7 @@ package se.cygni.talang.quality.repo;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import se.cygni.talang.quality.model.Brand;
-import se.cygni.talang.quality.model.Dealer;
+import se.cygni.talang.quality.model.Customer;
 import se.cygni.talang.quality.model.Vehicle;
 
 import java.sql.ResultSet;
@@ -30,10 +30,11 @@ public class DatabaseRepository implements Repository {
     }
 
     @Override
-    public Dealer getDealerByOrgNumber(String orgNumber) {
+    public Customer getCustomerByOrgNumber(String orgNumber) {
         Map<String, String> params = Map.of("orgNumber", orgNumber);
-        String sql = "SELECT organisationNumber, premiumCustomer FROM dealers WHERE organisationNumber=:orgNumber";
-        List<Dealer> result = jdbcTemplate.query(sql, params, new DealerRowMapper());
+        String sql = "SELECT organisationNumber, premiumCustomer FROM customers WHERE organisationNumber=:orgNumber";
+
+        List<Customer> result = jdbcTemplate.query(sql, params, new CustomerRowMapper());
         return resultOrEmpty(result);
     }
 
@@ -52,17 +53,19 @@ public class DatabaseRepository implements Repository {
         String sql = "insert into vehicles(registrationNumber, owner, brand) values (:regNum, :owner, :brand) " +
                 "   on conflict (registrationNumber) DO " +
                 "   UPDATE SET registrationNumber=:regNum, owner=:owner, brand=:brand";
+
         jdbcTemplate.update(sql, params);
     }
 
     @Override
-    public void saveDealer(Dealer dealer) {
+    public void saveCustomer(Customer customer) {
         Map<String, Object> params = Map.of(
-                "orgNum", dealer.getOrganisationNumber(),
-                "premium", dealer.isPremiumCustomer());
-        String sql = "insert into dealers(organisationNumber, premiumCustomer) values (:orgNum, :premium) " +
+                "orgNum", customer.getOrganisationNumber(),
+                "premium", customer.isPremiumCustomer());
+        String sql = "insert into customers(organisationNumber, premiumCustomer) values (:orgNum, :premium) " +
                 "    on conflict (organisationNumber) DO  " +
                 "    UPDATE SET organisationNumber=:orgNum, premiumCustomer=:premium";
+
         jdbcTemplate.update(sql, params);
     }
 
@@ -74,17 +77,18 @@ public class DatabaseRepository implements Repository {
             vehicle.setBrand(Brand.valueOf(rs.getString("brand")));
             return vehicle;
         }
-
     }
-    public static class DealerRowMapper implements RowMapper<Dealer> {
+
+    public static class CustomerRowMapper implements RowMapper<Customer> {
 
         @Override
-        public Dealer mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Dealer dealer = new Dealer(rs.getString("organisationNumber"));
-            dealer.setPremiumCustomer(rs.getBoolean("premiumCustomer"));
-            return dealer;
+        public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Customer customer = new Customer(rs.getString("organisationNumber"));
+            customer.setPremiumCustomer(rs.getBoolean("premiumCustomer"));
+            return customer;
         }
     }
+
     public static class BrandRowMapper implements RowMapper<Brand> {
 
         @Override
@@ -94,7 +98,7 @@ public class DatabaseRepository implements Repository {
     }
 
     private <T> T resultOrEmpty(List<T> result) {
-        if(result.size() != 1) {
+        if (result.size() != 1) {
             return null;
         }
         return result.get(0);
